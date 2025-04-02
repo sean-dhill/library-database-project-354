@@ -8,6 +8,7 @@ DROP TABLE IF EXISTS Member;
 DROP TABLE IF EXISTS Item;
 DROP TABLE IF EXISTS Room;
 DROP TABLE IF EXISTS Events;
+DROP TABLE IF EXISTS Registrations;
 
 --Member Table
 CREATE TABLE Member(
@@ -106,4 +107,14 @@ CREATE TABLE HelpRequest(
     solved BOOLEAN DEFAULT 0,
     FOREIGN KEY (memberID) REFERENCES Member(memberID),
     FOREIGN KEY (personnelID) REFERENCES Personnel(personnelID)
+);
+
+CREATE TABLE Registrations (
+    registrationID INTEGER PRIMARY KEY,
+    personID INTEGER NOT NULL,
+    eventID INTEGER NOT NULL,
+    registrationDate DATE NOT NULL,
+    role TEXT CHECK (role IN ('host', 'attendee', 'speaker')),
+    FOREIGN KEY (personID) REFERENCES Member(memberID),
+    FOREIGN KEY (eventID) REFERENCES Events(eventID)
 );

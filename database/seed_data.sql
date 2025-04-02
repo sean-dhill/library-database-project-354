@@ -95,6 +95,19 @@ INSERT INTO Scheduled (eventID, roomID, dateTime) VALUES
 (9, 6, '2024-04-25 18:00'),
 (10, 2, '2024-04-27 11:00');
 
+-- Registrations Table
+INSERT INTO Registrations (personID, eventID, registrationDate, role) VALUES
+(1, 1, '2024-04-01', 'attendee'),
+(2, 2, '2024-04-02', 'attendee'),
+(3, 3, '2024-04-03', 'speaker'),
+(4, 4, '2024-04-04', 'host'),
+(5, 5, '2024-04-05', 'attendee'),
+(6, 6, '2024-04-06', 'attendee'),
+(7, 7, '2024-04-07', 'speaker'),
+(8, 8, '2024-04-08', 'host'),
+(9, 9, '2024-04-09', 'attendee'),
+(10, 10, '2024-04-10', 'attendee');
+
 --Donation Table 
 INSERT INTO Donation (memberID, description, status, numItems) VALUES
 (1, 'Box of old magazines', 'accepted', 15),
