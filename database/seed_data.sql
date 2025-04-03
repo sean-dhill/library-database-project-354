@@ -82,19 +82,6 @@ INSERT INTO Events (name, date, time, type, targetAudience) VALUES
 ('Music Recital', '2024-04-25', '18:00', 'performance', 'all'),
 ('Craft Workshop', '2024-04-27', '11:00', 'workshop', 'children');
 
---Scheduled Table 
-INSERT INTO Scheduled (eventID, roomID, dateTime) VALUES
-(1, 1, '2024-04-01 18:00'),
-(2, 5, '2024-04-05 14:00'),
-(3, 3, '2024-04-10 10:00'),
-(4, 6, '2024-04-12 19:00'),
-(5, 8, '2024-04-14 17:00'),
-(6, 10, '2024-04-15 15:00'),
-(7, 7, '2024-04-20 13:00'),
-(8, 4, '2024-04-22 16:00'),
-(9, 6, '2024-04-25 18:00'),
-(10, 2, '2024-04-27 11:00');
-
 -- Registrations Table
 INSERT INTO Registrations (personID, eventID, registrationDate, role) VALUES
 (1, 1, '2024-04-01', 'attendee'),

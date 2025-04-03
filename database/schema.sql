@@ -1,6 +1,5 @@
 DROP TABLE IF EXISTS HelpRequest;
 DROP TABLE IF EXISTS Donation;
-DROP TABLE IF EXISTS Scheduled;
 DROP TABLE IF EXISTS Fine;
 DROP TABLE IF EXISTS Loan;
 DROP TABLE IF EXISTS Personnel;
@@ -78,15 +77,6 @@ CREATE TABLE Events(
     targetAudience TEXT
 );
 
---Scheduled Table
-CREATE TABLE Scheduled(
-    scheduleID INTEGER PRIMARY KEY,
-    eventID INTEGER NOT NULL,
-    roomID INTEGER NOT NULL,
-    dateTime DATETIME,
-    FOREIGN KEY (eventID) REFERENCES Events(eventID),
-    FOREIGN KEY (roomID) REFERENCES Room(roomID)
-);
 
 --Donation Table
 CREATE TABLE Donation(
