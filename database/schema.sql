@@ -7,7 +7,7 @@ DROP TABLE IF EXISTS Rooms;
 DROP TABLE IF EXISTS Events;
 DROP TABLE IF EXISTS Donations;
 DROP TABLE IF EXISTS HelpRequests;
-DROP TABLE IF EXISTS Registrations;
+DROP TABLE IF EXISTS Registers;
 
 CREATE TABLE Items (
     itemID INT UNSIGNED PRIMARY KEY,
@@ -16,7 +16,7 @@ CREATE TABLE Items (
     format VARCHAR(16),         -- e.g., print, digital, etc.
     available BOOL DEFAULT TRUE,
     dateAdded DATE,
-    price SMALLINT UNSIGNED,
+    price SMALLINT UNSIGNED
 );
 
 CREATE TABLE Members (
@@ -58,8 +58,7 @@ CREATE TABLE Rooms (
     roomID INT UNSIGNED PRIMARY KEY,
     name VARCHAR(64),           -- e.g., John A. MacDonald Theater, Conference 2, Main Hall, etc.
     floor TINYINT UNSIGNED,
-    capacity SMALLINT UNSIGNED,
-    PRIMARY KEY (roomID)
+    capacity SMALLINT UNSIGNED
 );
 
 CREATE TABLE Events (
@@ -82,7 +81,7 @@ CREATE TABLE Donations (
     FOREIGN KEY (memberID) REFERENCES Members(memberID)
 );
 
-CREATE TABLE HelpRequest (
+CREATE TABLE HelpRequests (
     requestID INT UNSIGNED PRIMARY KEY,
     requesterID INT UNSIGNED NOT NULL,
     librarianID INT UNSIGNED DEFAULT NULL, -- Null on request creation
