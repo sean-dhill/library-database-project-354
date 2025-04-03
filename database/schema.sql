@@ -1,120 +1,101 @@
-DROP TABLE IF EXISTS HelpRequest;
-DROP TABLE IF EXISTS Donation;
-DROP TABLE IF EXISTS Scheduled;
-DROP TABLE IF EXISTS Fine;
-DROP TABLE IF EXISTS Loan;
+DROP TABLE IF EXISTS Items;
+DROP TABLE IF EXISTS Members;
 DROP TABLE IF EXISTS Personnel;
-DROP TABLE IF EXISTS Member;
-DROP TABLE IF EXISTS Item;
-DROP TABLE IF EXISTS Room;
+DROP TABLE IF EXISTS Loans;
+DROP TABLE IF EXISTS Fines;
+DROP TABLE IF EXISTS Rooms;
 DROP TABLE IF EXISTS Events;
+DROP TABLE IF EXISTS Donations;
+DROP TABLE IF EXISTS HelpRequests;
 DROP TABLE IF EXISTS Registrations;
 
---Member Table
-CREATE TABLE Member(
-    memberID INTEGER PRIMARY KEY,
-    fname TEXT NOT NULL,
-    lname TEXT NOT NULL,
-    phone TEXT CHECK (length(phone) = 12),
-    email TEXT CHECK (instr(email, '@') > 1 AND instr(email, '.') > instr(email, '@')) NOT NULL,
-    address TEXT
-);
-
---Personnel Table
-CREATE TABLE Personnel (
-    personnelID INTEGER PRIMARY KEY,
-    memberID INTEGER NOT NULL,
-    jobTitle TEXT NOT NULL,
-    startDate DATE,
-    FOREIGN KEY (memberID) REFERENCES Member(memberID)
-);
-
---Item Table
-CREATE TABLE Item (
-    itemID INTEGER PRIMARY KEY,
-    title TEXT NOT NULL,
-    type TEXT NOT NULL, --book, cd, journal
-    format TEXT CHECK(format IN('print', 'digital')) NOT NULL,
-    available BOOLEAN DEFAULT 1,
+CREATE TABLE Items (
+    itemID INT UNSIGNED PRIMARY KEY,
+    name VARCHAR(128),
+    type VARCHAR(16),           -- e.g., book, cd, etc.
+    format VARCHAR(16),         -- e.g., print, digital, etc.
+    available BOOL DEFAULT TRUE,
     dateAdded DATE,
-    price INTEGER
+    price SMALLINT UNSIGNED,
 );
 
---Loan Table
-CREATE TABLE Loan(
-    loanID INTEGER PRIMARY KEY,
-    memberID INTEGER NOT NULL,
-    itemID INTEGER NOT NULL,
-    borrowDate DATE NOT NULL,
-    dueDate DATE NOT NULL,
-    returnDate DATE,
-    FOREIGN KEY (memberID) REFERENCES Member(memberID),
-    FOREIGN KEY (itemID) REFERENCES Item(itemID)  
+CREATE TABLE Members (
+    memberID INT UNSIGNED PRIMARY KEY,
+    fname VARCHAR(16),
+    lname VARCHAR(16),
+    phone VARCHAR(16),
+    email VARCHAR(64),
+    address VARCHAR(256),
+    CHECK (phone REGEXP '^[0-9]{3}-[0-9]{3}-[0-9]{4}$'),
+    CHECK (email LIKE '_%@_%._%')
 );
 
---Fine Table
-CREATE TABLE Fine(
-    fineID INTEGER PRIMARY KEY,
-    loanID INTEGER NOT NULL,
-    amount INTEGER NOT NULL,
-    FOREIGN KEY (loanID) REFERENCES Loan(loanID)
+CREATE TABLE Personnel (
+    memberID INT UNSIGNED PRIMARY KEY,
+    jobTitle VARCHAR(16),       -- e.g., librarian, clerk, archivist, etc.
+    startDate DATE,
+    FOREIGN KEY (memberID) REFERENCES Members(memberID)
 );
 
---Room Table
-CREATE TABLE Room(
-    roomID INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    floor INTEGER,
-    capacity INTEGER
+CREATE TABLE Loans (
+    loanID INT UNSIGNED PRIMARY KEY,
+    memberID INT UNSIGNED NOT NULL,
+    itemID INT UNSIGNED NOT NULL,
+    borrowDate DATE,
+    dueDate DATE,
+    returnDate DATE,             -- NULL if not returned
+    FOREIGN KEY (memberID) REFERENCES Members(memberID),
+    FOREIGN KEY (itemID) REFERENCES Items(itemID)
 );
 
---Event Table
-CREATE TABLE Events(
-    eventID INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    date DATE NOT NULL,
-    time TIME NOT NULL,
-    type TEXT,
-    targetAudience TEXT
+CREATE TABLE Fines (
+    loanID INT UNSIGNED PRIMARY KEY,
+    amount SMALLINT UNSIGNED,
+    FOREIGN KEY (loanID) REFERENCES Loans(loanID)
 );
 
---Scheduled Table
-CREATE TABLE Scheduled(
-    scheduleID INTEGER PRIMARY KEY,
-    eventID INTEGER NOT NULL,
-    roomID INTEGER NOT NULL,
-    dateTime DATETIME,
+CREATE TABLE Rooms (
+    roomID INT UNSIGNED PRIMARY KEY,
+    name VARCHAR(64),           -- e.g., John A. MacDonald Theater, Conference 2, Main Hall, etc.
+    floor TINYINT UNSIGNED,
+    capacity SMALLINT UNSIGNED,
+    PRIMARY KEY (roomID)
+);
+
+CREATE TABLE Events (
+    eventID INT UNSIGNED PRIMARY KEY,
+    roomID INT UNSIGNED,
+    name VARCHAR(64),
+    date DATE,                  -- format: YYYY-MM-DD
+    time TIME,
+    type VARCHAR(32),           -- e.g., book club, art show, writer signing, etc.
+    targetAudience VARCHAR(32), -- e.g., seniors, advanced readers, children, etc.
+    FOREIGN KEY (roomID) REFERENCES Rooms(roomID)
+);
+
+CREATE TABLE Donations (
+    donationID INT UNSIGNED PRIMARY KEY,
+    memberID INT UNSIGNED,
+    description VARCHAR(128),
+    status VARCHAR(10),         -- e.g., approved, pending, denied
+    numItems SMALLINT UNSIGNED,
+    FOREIGN KEY (memberID) REFERENCES Members(memberID)
+);
+
+CREATE TABLE HelpRequest (
+    requestID INT UNSIGNED PRIMARY KEY,
+    requesterID INT UNSIGNED NOT NULL,
+    librarianID INT UNSIGNED DEFAULT NULL, -- Null on request creation
+    issue VARCHAR(256),         -- description of issue
+    solved BOOL DEFAULT FALSE,
+    FOREIGN KEY (requesterID) REFERENCES Members(memberID),
+    FOREIGN KEY (librarianID) REFERENCES Members(memberID)
+);
+
+CREATE TABLE Registers (
+    eventID INT UNSIGNED NOT NULL,
+    memberID INT UNSIGNED NOT NULL,
+    PRIMARY KEY (eventID, memberID),
     FOREIGN KEY (eventID) REFERENCES Events(eventID),
-    FOREIGN KEY (roomID) REFERENCES Room(roomID)
-);
-
---Donation Table
-CREATE TABLE Donation(
-    donationID INTEGER PRIMARY KEY,
-    memberID INTEGER NOT NULL,
-    description TEXT NOT NULL,
-    status TEXT CHECK(status IN ('pending', 'accepted', 'rejected')) NOT NULL,
-    numItems INTEGER NOT NULL,
-    FOREIGN KEY (memberID) REFERENCES Member(memberID)
-);
-
---HelpRequest Table
-CREATE TABLE HelpRequest(
-    requestID INTEGER PRIMARY KEY,
-    memberID INTEGER NOT NULL,
-    personnelID INTEGER,
-    issue TEXT NOT NULL,
-    solved BOOLEAN DEFAULT 0,
-    FOREIGN KEY (memberID) REFERENCES Member(memberID),
-    FOREIGN KEY (personnelID) REFERENCES Personnel(personnelID)
-);
-
-CREATE TABLE Registrations (
-    registrationID INTEGER PRIMARY KEY,
-    personID INTEGER NOT NULL,
-    eventID INTEGER NOT NULL,
-    registrationDate DATE NOT NULL,
-    role TEXT CHECK (role IN ('host', 'attendee', 'speaker')),
-    FOREIGN KEY (personID) REFERENCES Member(memberID),
-    FOREIGN KEY (eventID) REFERENCES Events(eventID)
+    FOREIGN KEY (memberID) REFERENCES Members(memberID)
 );
