@@ -259,6 +259,119 @@ def register_for_event():
         if again not in ("y", "yes"):
             print("↩️ Returning to main menu.")
             return
+        
+def volunteer():
+    while True:
+        print("\nVolunteer at the Libary")
+
+        try:
+            member_id = int(input("Enter your member ID (or 0 to return to main menu): ").strip())
+            if member_id ==0:
+                print("Returning to main menu.")
+                return
+            
+            role = input("Enter the volunteer role you're applying for (bookshelver, event helper): ").strip()
+            if not role:
+                print("Role cannot be empty.")
+                continue
+        
+        except ValueError:
+            print("Invalid input")
+            continue
+
+        with connect_db() as conn:
+            cursor = conn.cursor()
+            try:
+                
+                cursor.execute("SELECT fname, lname FROM Member WHERE memberID = ?", (member_id,))
+                member = cursor.fetchone()
+                if not member:
+                    print("Member ID not found.")
+                    continue
+
+                
+                cursor.execute("SELECT * FROM Personnel WHERE memberID = ?", (member_id,))
+                if cursor.fetchone():
+                    print("This member is already volunteering or working at the library.")
+                    continue
+
+                cursor.execute("""
+                    INSERT INTO Personnel (memberID, jobTitle, startDate)
+                    VALUES (?, ?, DATE('now'))
+                """, (member_id, role))
+                conn.commit()
+                print(f"{member[0]} {member[1]} is now volunteering as a '{role.title()}'.")
+
+            except sqlite3.Error as e:
+                conn.rollback()
+                print(f"Database error: {e}")
+
+        again = input("\nRegister another volunteer? (y/n): ").strip().lower()
+        if again not in ("y", "yes"):
+            print("↩️ Returning to main menu.")
+            return
+
+def ask_librarian_help():
+    while True:
+        print("\nAsk a Librarian for Help")
+
+        try:
+            member_id = int(input("Enter your member ID (or 0 to cancel): ").strip())
+            if member_id == 0:
+                print("Returning to main menu.")
+                return
+
+            issue = input("Describe your issue: ").strip()
+            if not issue:
+                print("Issue cannot be empty.")
+                continue
+
+        except ValueError:
+            print("Invalid input. Please enter a valid member ID.")
+            continue
+
+        with connect_db() as conn:
+            cursor = conn.cursor()
+
+            try:
+                # Check if the member exists
+                cursor.execute("SELECT * FROM Member WHERE memberID = ?", (member_id,))
+                if not cursor.fetchone():
+                    print("Member ID not found.")
+                    continue
+
+                # Select a librarian from Personnel
+                cursor.execute("""
+                    SELECT memberID FROM Personnel
+                    WHERE LOWER(jobTitle) = 'librarian'
+                    LIMIT 1
+                """)
+                librarian = cursor.fetchone()
+
+                if not librarian:
+                    print("No librarians available right now. Try again later.")
+                    return
+
+                librarian_id = librarian[0]
+
+                # Insert help request
+                cursor.execute("""
+                    INSERT INTO HelpRequest (memberID, librarianID, issue, solved)
+                    VALUES (?, ?, ?, 0)
+                """, (member_id, librarian_id, issue))
+
+                conn.commit()
+                print(f"Help request submitted! A librarian (ID: {librarian_id}) will assist you soon.")
+
+            except sqlite3.Error as e:
+                conn.rollback()
+                print(f"Database error: {e}")
+
+        again = input("\nSubmit another help request? (y/n): ").strip().lower()
+        if again not in ("y", "yes"):
+            print("Returning to main menu.")
+            return
+
 
             
 
@@ -298,6 +411,10 @@ def show_menu():
             view_event()
         elif choice == 7:
             register_for_event()
+        elif choice == 8:
+            volunteer()
+        elif choice == 9:
+            ask_librarian_help()
         elif choice == 0:
             print("Goodbye!")
             break

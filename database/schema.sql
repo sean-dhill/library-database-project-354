@@ -21,8 +21,7 @@ CREATE TABLE Member(
 
 --Personnel Table
 CREATE TABLE Personnel (
-    personnelID INTEGER PRIMARY KEY,
-    memberID INTEGER NOT NULL,
+    memberID INTEGER PRIMARY KEY,
     jobTitle TEXT NOT NULL,
     startDate DATE,
     FOREIGN KEY (memberID) REFERENCES Member(memberID)
@@ -53,8 +52,7 @@ CREATE TABLE Loan(
 
 --Fine Table
 CREATE TABLE Fine(
-    fineID INTEGER PRIMARY KEY,
-    loanID INTEGER NOT NULL,
+    loanID INTEGER PRIMARY KEY,
     amount INTEGER NOT NULL,
     FOREIGN KEY (loanID) REFERENCES Loan(loanID)
 );
@@ -92,11 +90,11 @@ CREATE TABLE Donation(
 CREATE TABLE HelpRequest(
     requestID INTEGER PRIMARY KEY,
     memberID INTEGER NOT NULL,
-    personnelID INTEGER,
+    librarianID INTEGER,
     issue TEXT NOT NULL,
     solved BOOLEAN DEFAULT 0,
     FOREIGN KEY (memberID) REFERENCES Member(memberID),
-    FOREIGN KEY (personnelID) REFERENCES Personnel(personnelID)
+    FOREIGN KEY (librarianID) REFERENCES Personnel(memberID)
 );
 
 CREATE TABLE Registrations (

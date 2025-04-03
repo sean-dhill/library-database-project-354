@@ -12,10 +12,10 @@ INSERT INTO Member (fname, lname, phone, email, address) VALUES
 ('Eva', 'Cruz', '222-111-0000', 'eva@example.com', '505 Reader Rd');
 
 --Personnel Table 
-INSERT INTO Personnel (personnelID, memberID, jobTitle, startDate) VALUES
-(1, 1, 'Librarian', '2022-01-10'),
-(2, 2, 'Archivist', '2021-06-20'),
-(3, 3, 'Clerk', '2023-03-14');
+INSERT INTO Personnel (memberID, jobTitle, startDate) VALUES
+(1, 'Librarian', '2022-01-10'),
+(2, 'Archivist', '2021-06-20'),
+(3, 'Clerk', '2023-03-14');
 
 --Item Table 
 INSERT INTO Item (title, type, format, available, dateAdded, price) VALUES
@@ -109,7 +109,7 @@ INSERT INTO Donation (memberID, description, status, numItems) VALUES
 (10, 'Travel journals', 'rejected', 4);
 
 --HelpRequest Table 
-INSERT INTO HelpRequest (memberID, personnelID, issue, solved) VALUES
+INSERT INTO HelpRequest (memberID, librarianID, issue, solved) VALUES
 (4, 1, 'Need help finding study material', 0),
 (5, 2, 'Can’t log in to library account', 1),
 (6, 1, 'Overdue book not showing return option', 0),
